@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/static/lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="/static/css/public.css" media="all">
+</head>
+<body>
+<form class="layui-form" lay-filter="formTest" action="" method="post">
+    <div class="layui-form-item">
+            <div class="layui-form-label">用户名</div>
+            <div class="layui-input-inline"><input class="layui-input" name="name"></div>
+    </div>
+    <div class="layui-form-item">
+            <div class="layui-form-label">密码</div>
+            <div class="layui-input-inline"><input type="password" name="password" class="layui-input"></div>
+            <div class="layui-input-inline"><input type="text" name="id" style="display: none" class="layui-input"></div>
+    </div>
+    <div class="layui-form-item">
+            <div class="layui-form-label">确认密码</div>
+            <div class="layui-input-inline"><input type="password" name="password1" class="layui-input"></div>
+    </div>
+    <div class="layui-form-item">
+            <div class="layui-form-label">手机号</div>
+            <div class="layui-input-inline"><input type="text" name="phone" class="layui-input"></div>
+    </div>
+    <div class="layui-form-item">
+            <div class="layui-form-label">邮箱</div>
+            <div class="layui-input-inline"><input type="text" name="email" class="layui-input"></div>
+    </div>
+    <div>
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="*" lay-event="add">立即提交</button>
+            <button id="cancel" class="layui-btn layui-btn-primary">取消</button>
+        </div>
+    </div>
+</form>
+<script src="/static/lib/layui-v2.5.5/layui.all.js" charset="utf-8"></script>
+<script>
+    layui.use(['form','layer'], function() {
+        var form = layui.form,
+            layer=layui.layer;
+        var $=layui.$;
+        var id = window.location.href.split("=")[1]
+        $.ajax({
+            url:"/users/user/"+id,
+            success:function (msg) {
+                var data=msg.data;
+                form.val("formTest", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
+                    "name": data.name // "name": "value"
+                    ,"password": data.password
+                    ,"password1": data.password
+                    ,"email": data.email
+                    ,"phone": data.phone
+                    ,"id":id
+                });
+
+            }
+        })
+        form.on('submit(*)',function (data) {
+            $.ajax({
+                url:"/users",
+                type:"post",
+                data:data.field,
+                success:function(result){
+                    if (result.code=="0000"){
+                        parent.layui.table.reload('test');
+                        parent.layer.close(parent.layer.getFrameIndex(window.name));
+                    }
+                }
+            });
+            return false;
+        })
+        $("#cancel").click(function () {
+            parent.layer.close(parent.layer.getFrameIndex(window.name));
+            return false
+        })
+    })
+</script>
+</body>
+</html>
