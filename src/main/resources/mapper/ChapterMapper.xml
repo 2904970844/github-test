@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mapper.ChapterMapper">
+
+    <resultMap id="ChapterBase" type="com.pojo.entity.Chapter">
+        <id column="id" property="id"/>
+        <result property="chapterId" column="chapter_id"/>
+        <result property="publishDate" column="publish_date"/>
+        <result property="bookId" column="book_id"/>
+        <result property="readCount" column="read_count"/>
+        <result property="replyCount" column="reply_count"/>
+        <result property="payState" column="pay_state"/>
+    </resultMap>
+
+    <resultMap id="ChapterMap" type="com.pojo.entity.Chapter" extends="ChapterBase">
+        <association property="book" resultMap="com.mapper.BookMapper.BookBase" javaType="com.pojo.entity.Book"/>
+    </resultMap>
+
+    <select id="findWithBook" resultMap="ChapterMap">
+        select c.id,c.chapter_id,c.title,c.publish_date,c.words,b.title b_title,b.summary,b.author,b.id b_id
+        from chapter c inner join book b on c.book_id = b.id
+               where ${ew.sqlSegment}
+	</select>
+
+    <select id="findById" resultMap="ChapterBase" parameterType="int">
+       select * from chapter where id=#{id}
+	</select>
+    <select id="findByBookId" resultMap="ChapterBase">
+       select * from chapter where chapter_id=#{chapterId} and book_id=#{bookId}
+	</select>
+
+    <select id="find" resultMap="ChapterBase" parameterType="com.pojo.entity.Chapter">
+        select id,title from chapter
+        <where>
+            <if test="bookId!=null">and book_id=#{bookId}</if>
+            <if test="chapterId!=null">and chapter_id=#{chapterId}</if>
+            <if test="title!=null">and title like concat("%",#{title},"%")</if>
+        </where>
+    </select>
+    
+    <insert id="add" parameterType="com.pojo.entity.Chapter">
+        insert into chapter (chapter_id,title,book_id
+        <if test="content!=null">,content</if>
+        <if test="words!=null">,words</if>
+        <if test="readCount!=null">,read_count</if>
+        <if test="replyCount!=null">,reply_count</if>
+        <if test="payState!=null">,pay_state</if>
+        ) value(#{chapterId},#{title},#{bookId}
+        <if test="content!=null">,#{content}</if>
+        <if test="words!=null">,#{words}</if>
+        <if test="readCount!=null">,#{readCount}</if>
+        <if test="replyCount!=null">,#{replyCount}</if>
+        <if test="payState!=null">,#{payState}</if>
+        )
+    </insert>
+    
+    <update id="update" parameterType="com.pojo.entity.Chapter">
+        update chapter
+        <set>
+            <if test="title!=null">title=#{title},</if>
+            <if test="chapterId!=null">chapter_id=#{chapterId},</if>
+            <if test="content!=null">content=#{content},</if>
+            <if test="words!=null">words=#{words},</if>
+            <if test="bookId!=null">book_id=#{bookId},</if>
+            <if test="readCount!=null">read_count=#{readCount},</if>
+            <if test="replyCount!=null">reply_count=#{replyCount},</if>
+            <if test="payState!=null">pay_state=#{payState},</if>
+        </set>
+        where id=${id}
+    </update>
+    
+    <select id="delete" parameterType="java.lang.Integer">
+		delete from chapter where id=${id}
+	</select>
+</mapper>

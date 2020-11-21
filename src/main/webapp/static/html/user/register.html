@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>layui.form小例子</title>
+    <link rel="stylesheet" href="/static/lib/layui-v2.5.5/css/layui.css" media="all">
+</head>
+<body class="layui-bg-gray">
+<div class="layui-container">
+    <div class="layui-row">
+        <div class="layui-card">
+            <div class="layui-card-header">注册用户</div>
+            <div class="layui-card-body">
+                <form class="layui-form" action="" method="post">
+                    <div class="layui-form-item layui-form-pane">
+                        <label class="layui-form-label">用户名：</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="name" placeholder="请输入用户名" required class="layui-input" lay-verify="required">
+                        </div>
+                    </div>
+                    <div class="layui-form-item layui-form-pane">
+                        <label class="layui-form-label">密码</label>
+                        <div class="layui-input-block">
+                            <input type="password" name="password" required class="layui-input" lay-verify="required">
+                        </div>
+                    </div>
+                    <div class="layui-form-item layui-form-pane">
+                        <label class="layui-form-label">确认密码：</label>
+                        <div class="layui-input-block">
+                            <input type="password" name="pwd1" required class="layui-input" lay-verify="required">
+                        </div>
+                    </div>
+                    <div class="layui-form-item layui-form-pane">
+                        <label class="layui-form-label">手机：</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="phone" required class="layui-input" lay-verify="phone">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="layui-input-block">
+                            <button class="layui-btn" lay-submit lay-filter="*">立即提交</button>
+                            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="/static/lib/layui-v2.5.5/layui.all.js"></script>
+<script>
+    layui.use(['form','layer'], function() {
+        var form = layui.form,
+        layer=layui.layer;
+        var $=layui.$;
+        form.on('submit(*)',function (data) {
+            if (data.field.password!=data.field.pwd1){
+                layer.msg("两次密码输入不一致");
+                // console.info(data.field.password="");
+                $("input[type=password]").val("");
+                return false;
+            }
+
+           /* $.post("/users",data.field,function (msg) {
+                //重新加载表格数据
+                parent.layui.table.reload('test');
+                parent.layer.close(parent.layer.getFrameIndex(window.name));
+            })*/
+            var date = JSON.stringify(data.field).replace( new RegExp( '":"' , "g" ),"=").replace( new RegExp('","', "g" ),"&").replace('{"',"?").replace('"}',"");
+            $.ajax({
+                url:"/users/user"+date,
+                type:"PUT",
+                data:data.field,
+                success:function(result){
+                    if (result.code=="0000"){
+                        parent.layui.table.reload('test');
+                        parent.layer.close(parent.layer.getFrameIndex(window.name));
+                    }
+                }
+            });
+
+            return false;
+        })
+    })
+</script>
+</body>
+</html>

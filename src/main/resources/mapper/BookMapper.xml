@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mapper.BookMapper">
+
+	<resultMap id="BookBase" type="com.pojo.entity.Book">
+		<id property="id" column="b_id"/>
+		<result property="title" column="b_title"/>
+		<result property="chapterCount" column="chapter_count"/>
+		<result property="processState" column="process_state"/>
+		<result property="currentChapter" column="current_chapter"/>
+		<result property="publishDate" column="publish_date"/>
+		<result property="coverPic" column="cover_pic"/>
+		<result property="categoryId" column="category_id"/>
+	</resultMap>
+
+
+
+	<resultMap id="BookMap" type="com.pojo.entity.Book" extends="BookBase">
+		<collection property="chapterList" resultMap="com.mapper.ChapterMapper.ChapterBase"/>
+	</resultMap>
+
+
+
+	<select id="find" resultMap="BookMap">
+		 select c.id,c.chapter_id,c.book_id,c.title,c.publish_date,c.words,b.title b_title,b.summary,b.author,b.id b_id
+        from chapter c inner join book b on c.book_id = b.id
+	</select>
+
+</mapper>
